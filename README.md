@@ -1,6 +1,6 @@
 # sosan-server
-This is a server that is implemented in C/C++. <br />
-We support Linux first.
+This is a server that is implemented in JAVA, Netty Framework. <br />
+This project is in the process of development
 
 # Overall
 ![Alt text](overall.jpg?raw=true)
@@ -10,16 +10,14 @@ We support Linux first.
 
 # Abstract Plugin Handler Interface
 ```
-class PluginHandler {
+class PluginHandler implements AbstractPluginHandler {
 
-  MemPool mp; // Memory pool object
+  boolean init();
 
-  virtual bool init() = 0;
+  boolean request();
 
-  virtual bool request() = 0;
+  boolean destroy();
 
-  virtual bool destroy() = 0;
-
-  virtual bool heartbeat() = 0;
-};
+  boolean heartBeat();
+}
 ```
