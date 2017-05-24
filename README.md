@@ -1,6 +1,6 @@
 # sosan-server
-This is a server that is implemented in JAVA, Netty Framework. <br />
-This project is in the process of development
+This is a server that is implemented in Java, Netty Framework. <br />
+This project is in the process of development.
 
 # Overall
 ![Alt text](overall.jpg?raw=true)
