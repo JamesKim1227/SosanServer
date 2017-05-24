@@ -9,9 +9,8 @@ This project is in the process of development.
 ![Alt text](server_internal.jpg?raw=true)
 
 # Abstract Plugin Handler Interface
-```
-class PluginHandler implements AbstractPluginHandler {
-
+```java
+public interface AbstractPluginHandler {
   boolean init();
 
   boolean request();
@@ -19,5 +18,9 @@ class PluginHandler implements AbstractPluginHandler {
   boolean destroy();
 
   boolean heartBeat();
+}
+
+class PluginHandler implements AbstractPluginHandler {
+  ...
 }
 ```
