@@ -1,6 +1,10 @@
 # sosan-server
-This is a server that is implemented in Java, Netty Framework. <br />
-This project is in the process of development.
+개발중
+
+# Open Source License
+Apache APR <br>
+https://github.com/apache/apr<br>
+Apache License 2.0
 
 # Overall
 ![Alt text](overall.jpg?raw=true)
@@ -9,18 +13,3 @@ This project is in the process of development.
 ![Alt text](server_internal.jpg?raw=true)
 
 # Abstract Plugin Handler Interface
-```java
-public interface AbstractPluginHandler {
-  boolean init();
-
-  boolean request();
-
-  boolean destroy();
-
-  boolean heartBeat();
-}
-
-class PluginHandler implements AbstractPluginHandler {
-  ...
-}
-```
