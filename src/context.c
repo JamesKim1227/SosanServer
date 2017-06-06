@@ -3,9 +3,58 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <apr_dso.h>
+
 #include "context.h"
 #include "worker_thread.h"
+#include "plugin_handler.h"
 
+Plugin_Handler*
+create_plugin_handler(int client_socket)
+{
+  apr_dso_handle_t *dso_h;
+  apr_pool_t *mp;
+  apr_status_t rv;
+  apr_dso_handle_sym_t init = NULL;
+  apr_dso_handle_sym_t request = NULL;
+  apr_dso_handle_sym_t destroy = NULL;
+  Plugin_Handler *ph = malloc(sizeof(Plugin_Handler));
+  char buf[1024];
+  
+  apr_pool_create(&mp, NULL);
+  
+  if ((rv = apr_dso_load(&dso_h, "libsample_dso.so", mp)) != APR_SUCCESS)
+  {
+    printf("apr_dso_load error: %s\n", apr_strerror(rv, buf, 1024));
+    return NULL;
+  }
+
+  if ((rv = apr_dso_sym(&init, dso_h, "init")) != APR_SUCCESS)
+  {
+    printf("apr_dso_sym error\n");
+    return NULL;
+  }
+  
+  if ((rv = apr_dso_sym(&request, dso_h, "request")) != APR_SUCCESS)
+  {
+    printf("apr_dso_sym error\n");
+    return NULL;
+  }
+  
+  if ((rv = apr_dso_sym(&destroy, dso_h, "destroy")) != APR_SUCCESS)
+  {
+    printf("apr_dso_sym error\n");
+    return NULL;
+  }
+  
+  ph->client_socket = client_socket;
+  
+  ph->init = init;
+  ph->request = request;
+  ph->destroy = destroy;
+  
+  return ph;
+}
 
 static void
 add_to_worker_thread(Context *ctx, int client_socket)
@@ -31,9 +80,18 @@ add_to_worker_thread(Context *ctx, int client_socket)
     }
   }
   
-  w_th->ev.data.fd = client_socket;
+  Plugin_Handler *ph = create_plugin_handler(client_socket);
+  if (!ph)
+  {
+    printf("create plugin handler error\n");
+    exit(1);
+  }
+  ph->init();
+  w_th->ev.data.ptr = (void*)ph;
+  // w_th->ev.data.fd = client_socket;
   epoll_ctl(w_th->epoll_fd, EPOLL_CTL_ADD, client_socket, &w_th->ev);
   w_th->event_count++;
+  
   printf("add_to_worker_thread - end, load_balance_index : %d\n", load_balance_index);
 }
 

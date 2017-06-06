@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include <apr_getopt.h>
+#include <apr_dso.h>
 
 #include "context.h"
 #include "listener.h"
@@ -21,6 +22,7 @@ main(int argc, char const *argv[]) {
   const char *optarg;
   int ret = 0;
   pthread_t listener;
+
 
   static const apr_getopt_option_t opt_option[] =
   {
@@ -54,7 +56,7 @@ main(int argc, char const *argv[]) {
     ret = -1;
     goto exception_handler;
   }
-
+  
   // create thread pool
   printf("creating thread pool...\n");
   ctx = (Context *)malloc(sizeof(Context));
@@ -68,6 +70,8 @@ main(int argc, char const *argv[]) {
  
 exception_handler:
   printf("terminating...\n");
+  //apr_dso_unload(dso_h);
+  apr_pool_destroy(mp);
   apr_terminate();
 
   return ret;

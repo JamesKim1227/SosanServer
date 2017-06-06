@@ -18,7 +18,6 @@ struct worker_thread
   struct epoll_event events[1024];
   int event_count;
   
-  
   void* (*run)(void *arg);
 };
 
