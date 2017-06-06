@@ -9,9 +9,11 @@
 #include "context.h"
 #include "listener.h"
 
-#define DEBUG(format, ...) printf(format"[%d],[%s]", __LINE__, __FILE__);
 
-int main(int argc, char const *argv[]) {
+Context *ctx;
+
+int
+main(int argc, char const *argv[]) {
   apr_status_t rv;
   apr_pool_t *mp;
   apr_getopt_t *opt;
@@ -28,8 +30,6 @@ int main(int argc, char const *argv[]) {
     { NULL, 0, 0, NULL },
   };
 
-  printf("1");
-  
   apr_initialize();
   apr_pool_create(&mp, NULL);
 
@@ -47,7 +47,6 @@ int main(int argc, char const *argv[]) {
         break;
     }
   }
-  printf("22222222222222\n");
   
   if (rv != APR_EOF)
   {
@@ -56,28 +55,19 @@ int main(int argc, char const *argv[]) {
     goto exception_handler;
   }
 
-  printf("333333333333333\n");
   // create thread pool
-  Context *ctx = (Context *)malloc(sizeof(Context));
-  
-  
-  printf("44444444\n");
-  context_init(ctx);
-  
-  
-  printf("555555555\n");
+  printf("creating thread pool...\n");
+  ctx = (Context *)malloc(sizeof(Context));
+  context_init(ctx, 8);
   ctx->create_thread_pool(ctx, 8);
   
-  printf("6666666666\n");
   // create listener
-  pthread_create(&listener, NULL, create_listener_thread, NULL);
-  
-  printf("77777777\n");
-  
+  printf("creating listener...\n");
+  pthread_create(&listener, NULL, create_listener_thread, (void*)ctx);
   pthread_join(listener, NULL);
-  
-
-exception_handler:  
+ 
+exception_handler:
+  printf("terminating...\n");
   apr_terminate();
 
   return ret;
